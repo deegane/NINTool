@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     submitForm(e) {
-      if(e.key=='Enter') {
+      if(e.type=='click' || (e.type=='keypress' && e.key=='Enter')) {
         this.$refs['details'].validate((valid) => {
           if (valid) {
             this.post()
@@ -89,7 +89,7 @@ export default {
     resetForm() {
       this.NIN = ''
       this.errorMsg = ''
-      this.$refs['nin'].resetFields()
+      this.$refs['details'].resetFields()
     },
     post () {
       axios.post('/generate', {

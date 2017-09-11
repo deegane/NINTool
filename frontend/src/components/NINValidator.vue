@@ -63,8 +63,7 @@
   },
   methods: {
     submitForm (e) {
-      console.log(e)
-      if(e.key=='Enter') {
+      if(e.type=='click' || (e.type=='keypress' && e.key=='Enter')) {
         this.$refs['nin'].validate((valid) => {
           if (valid) {
             this.post()

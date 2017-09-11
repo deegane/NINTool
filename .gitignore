@@ -3,7 +3,9 @@ target/
 node/
 node_modules/
 static
+./backend/src/main/resources/public
 
+.DS_Store
 
 ### IntelliJ IDEA ###
 .idea
