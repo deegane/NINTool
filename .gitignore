@@ -3,7 +3,7 @@ target/
 node/
 node_modules/
 static
-./backend/src/main/resources/public
+backend/src/main/resources/public
 
 .DS_Store
 
