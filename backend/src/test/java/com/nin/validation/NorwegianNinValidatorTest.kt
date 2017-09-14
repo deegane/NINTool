@@ -1,6 +1,5 @@
 package com.nin.validation
 
-import com.nin.model.Gender
 import com.nin.util.NINUtil
 import org.junit.Assert
 import org.junit.Test
@@ -106,7 +105,7 @@ class NorwegianNinValidatorTest {
     fun males() {
         males.forEach {
             assertTrue(NorwegianNinValidator.validateNorwegianNin(it).valid)
-            assertTrue(NINUtil.getDetails(it).gender == Gender.MALE)
+            assertTrue(NINUtil.details(it).gender.isMale)
         }
     }
 
@@ -114,7 +113,7 @@ class NorwegianNinValidatorTest {
     fun females() {
         females.forEach {
             assertTrue(NorwegianNinValidator.validateNorwegianNin(it).valid)
-            assertTrue(NINUtil.getDetails(it).gender == Gender.FEMALE)
+            assertTrue(NINUtil.details(it).gender.isFemale)
         }
     }
 

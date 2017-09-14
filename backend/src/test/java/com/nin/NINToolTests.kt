@@ -23,5 +23,6 @@ class NINToolTests {
         val fakeNIN = NINUtil.generateFakeNIN(Details(Gender.MALE, date))
         val norwegianIdNumber = NorwegianNinValidator.validateNorwegianNin(fakeNIN)
         assertTrue(norwegianIdNumber.valid)
+        assertTrue(NINUtil.details(fakeNIN).gender.isMale)
     }
 }

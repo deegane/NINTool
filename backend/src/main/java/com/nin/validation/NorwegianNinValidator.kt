@@ -30,7 +30,7 @@ object NorwegianNinValidator {
     private val matchesRegex = { nin: String -> Regex("[0-9]{2}[0,1][0-9][0-9]{2}[0-9]{5}").containsMatchIn(nin) }
     private val matchesChecksum1 = { nin: String -> matchesChecksum(nin, checksumSeries1) }
     private val matchesChecksum2 = { nin: String -> matchesChecksum(nin, checksumSeries2) }
-    private val isValidBirthDate = { nin: String -> isValidBirthDate(nin, H_NUMBER) }
+    private val isValidBirthDate = { nin: String -> validBirthDate(nin, H_NUMBER) }
 
     fun validateNorwegianNin(nin: String): NinValidationResult {
 
@@ -59,10 +59,9 @@ object NorwegianNinValidator {
         return NinValidationResult.success()
     }
 
-    private fun matchesChecksum(nin: String, checksum: IntArray) =
-            (0 until checksum.size).sumBy { checksum[it] * getNinAsInts(nin)[it] } % 11 == 0
+    private fun matchesChecksum(nin: String, checksum: IntArray) = (0 until checksum.size).sumBy { checksum[it] * ninAsInts(nin)[it] } % 11 == 0
 
-    private fun getNinAsInts(nin: String): IntArray {
+    private fun ninAsInts(nin: String): IntArray {
         val ninInt = IntArray(LENGTH)
         for (i in 0 until LENGTH) {
             ninInt[i] = nin[i] - '0'
@@ -70,7 +69,7 @@ object NorwegianNinValidator {
         return ninInt
     }
 
-    private fun isValidBirthDate(nin: String, ninType: String) : Boolean {
+    private fun validBirthDate(nin: String, ninType: String) : Boolean {
 
         var day = nin.substring(0, 2).toInt()
         var month = nin.substring(2, 4).toInt()
@@ -110,7 +109,7 @@ object NorwegianNinValidator {
             return false
         }
 
-        val isValid = !isInvalidValidDateOfBirth(day, month, fullYear)
+        val isValid = !invalidDateOfBirth(day, month, fullYear)
         if (!isValid) {
             print("NIN Validation failed due to invalid date of birth. NIN: {} $nin")
         }
@@ -121,7 +120,7 @@ object NorwegianNinValidator {
     /**
      * Forwards compatible for 20+ years
      */
-    private fun isInvalidValidDateOfBirth(day: Int, month: Int, year: Int) =
+    private fun invalidDateOfBirth(day: Int, month: Int, year: Int) =
          year < 1854 || year > 2039 || month < 1 || month > 12 || day < 1 || day > maxDaysInMonth(year, month)
 
     private fun maxDaysInMonth(year: Int, month: Int) = LocalDate.of(year, month, 1).lengthOfMonth()

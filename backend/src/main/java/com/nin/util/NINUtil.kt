@@ -79,7 +79,7 @@ object NINUtil {
         val nin = digits.joinToString(separator = "")
 
         // approx 10% of the time an invalid NIN is generated so add retry
-        when (isValid(nin)) {
+        when (valid(nin)) {
             true -> return nin
             false -> if (retry > 0) {
                 return generateFakeNIN(DOB,gender,retry - 1)
@@ -89,34 +89,29 @@ object NINUtil {
         throw IllegalArgumentException("Could not generate NIN")
     }
 
-    private fun isValid(nin: String) = NorwegianNinValidator.validateNorwegianNin(nin).valid
-    private fun getGender(nin: String) = if (Character.getNumericValue(nin[8]) % 2 != 0) Gender.MALE else Gender.FEMALE
+    private fun valid(nin: String) = NorwegianNinValidator.validateNorwegianNin(nin).valid
+    private fun gender(nin: String) = if (Character.getNumericValue(nin[8]) % 2 != 0) Gender.MALE else Gender.FEMALE
 
     private fun calculateControlDigit(checkDigitSeries: IntArray, digits: IntArray): Int {
         val sumDigits = (0 until checkDigitSeries.size).sumBy { checkDigitSeries[it] * digits[it] }
-
-        var control = 11 - sumDigits % 11
-        if (control == 11) control = 0
-
-        return control
+        val control = 11 - sumDigits % 11
+        return if (control == 11) 0 else control
     }
 
-
-
-    fun getDetails(nin: String): Details {
+    fun details(nin: String): Details {
 
         val result = NorwegianNinValidator.validateNorwegianNin(nin)
 
         if(result.valid) {
-            val gender = getGender(nin)
-            val DOB = getDOB(nin)
+            val gender = gender(nin)
+            val DOB = dob(nin)
             return Details(gender, DOB)
         }
 
         throw IllegalArgumentException(result.reason)
     }
 
-    private fun getDOB(nin: String): Date {
+    private fun dob(nin: String): Date {
 
         val day = nin.substring(0, 2).toInt()
         val month = nin.substring(2, 4).toInt()
@@ -124,7 +119,7 @@ object NINUtil {
         val personalDigits = nin.substring(6, 9).toInt()
 
         val fullYear = if (personalDigits < 500) {
-          year + 1900
+            year + 1900
         } else if (personalDigits < 750 && year >= 54) {
             year + 1800
         } else if (year < 40) {
