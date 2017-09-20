@@ -5,17 +5,17 @@ import java.time.LocalDate
 
 object NorwegianNinValidator {
 
-    private val FH_NUMBER = "FHNumber"
-    private val D_NUMBER = "DNumber"
-    private val H_NUMBER = "HNumber"
+    private const val FH_NUMBER = "FHNumber"
+    private const val D_NUMBER = "DNumber"
+    private const val H_NUMBER = "HNumber"
 
-    private val NIN_HAS_AN_INCORRECT_LENGTH = "NIN has an incorrect length."
-    private val NIN_DOES_NOT_MATCH_NEEDED_REGEX = "NIN does not match needed regex."
-    private val NIN_DOES_NOT_MATCH_FIRST_CHECKSUM_MODULO = "NIN does not match checksum modulo."
-    private val NIN_DOES_NOT_MATCH_SECOND_CHECKSUM_MODULO = "NIN does not match checksum modulo."
-    private val INVALID_BIRTH_DATE_FOR_GIVEN_NIN = "Invalid birth date for given NIN."
+    private const val NIN_HAS_AN_INCORRECT_LENGTH = "NIN has an incorrect length."
+    private const val NIN_DOES_NOT_MATCH_NEEDED_REGEX = "NIN does not match needed regex."
+    private const val NIN_DOES_NOT_MATCH_FIRST_CHECKSUM_MODULO = "NIN does not match checksum modulo."
+    private const val NIN_DOES_NOT_MATCH_SECOND_CHECKSUM_MODULO = "NIN does not match checksum modulo."
+    private const val INVALID_BIRTH_DATE_FOR_GIVEN_NIN = "Invalid birth date for given NIN."
 
-    private val LENGTH = 11
+    private const val LENGTH = 11
 
     // The two checksum series
     // From https://nn.wikipedia.org/wiki/F%C3%B8dselsnummer

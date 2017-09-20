@@ -22,7 +22,7 @@ object NINUtil {
 
     val DATE_FORMATTER: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
-    private val RETRY = 10
+    private const val RETRY = 10
 
     fun generateFakeNIN(details: Details) = generateFakeNIN(
             details.dob.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString(),
