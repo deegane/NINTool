@@ -30,7 +30,7 @@ object NorwegianNinValidator {
     private val matchesRegex = { nin: String -> Regex("[0-9]{2}[0,1][0-9][0-9]{2}[0-9]{5}").containsMatchIn(nin) }
     private val matchesChecksum1 = { nin: String -> matchesChecksum(nin, checksumSeries1) }
     private val matchesChecksum2 = { nin: String -> matchesChecksum(nin, checksumSeries2) }
-    private val isValidBirthDate = { nin: String -> validBirthDate(nin, H_NUMBER) }
+    private val isValidBirthDate = { nin: String -> validBirthDate(nin, "") }
 
     fun validateNorwegianNin(nin: String): NinValidationResult {
 

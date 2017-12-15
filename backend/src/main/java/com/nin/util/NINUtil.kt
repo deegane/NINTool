@@ -1,12 +1,16 @@
 package com.nin.util
 
 
+import com.nin.model.BatchRequest
 import com.nin.model.Details
 import com.nin.model.Gender
 import com.nin.validation.NorwegianNinValidator
+import java.io.BufferedWriter
+import java.io.File
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
@@ -20,14 +24,61 @@ object NINUtil {
     private val checksumSeries1 = intArrayOf(3, 7, 6, 1, 8, 9, 4, 5, 2, 1)
     private val checksumSeries2 = intArrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1)
 
-    val DATE_FORMATTER: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-
+    private const val GENDER_DIGIT = 8
     private const val RETRY = 10
+
+    val DATE_FORMATTER: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd-MM-yyyy")
 
     fun generateFakeNIN(details: Details) = generateFakeNIN(
             details.dob.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString(),
             details.gender,
             RETRY)
+
+    fun generateBatch(batch: BatchRequest) : File {
+
+        val nins = generateList(batch)
+
+        val file = File.createTempFile("tmp", ".txt")
+
+        file.bufferedWriter().use {
+            out -> nins.forEachIndexed { i, nin -> out.writeLn(nin, i, batch.numberToGenerate - 1)}
+        }
+
+        return file
+    }
+
+    private fun BufferedWriter.writeLn(line: String, current: Int, size: Int) {
+        this.write(line)
+        if(size!=current) {
+            this.newLine()
+        }
+    }
+
+    private fun generateList(batch: BatchRequest) : Set<String> {
+        val nins = mutableSetOf<String>()
+        val fromDate = batch.from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        val toDate = batch.to.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+
+        if(fromDate.isAfter(toDate)) {
+            throw IllegalArgumentException("From date must be after To date")
+        }
+
+        val days = ChronoUnit.DAYS.between(fromDate, toDate)
+
+        while(nins.size < batch.numberToGenerate) {
+
+            val randomDate = fromDate.plusDays(ThreadLocalRandom.current().nextLong(days+1))
+
+            val nin = generateFakeNIN(
+                    randomDate.toString(),
+                    batch.gender,
+                    RETRY)
+
+            nins.add(nin)
+        }
+
+       return nins
+    }
 
     private fun generateFakeNIN(DOB: String, gender: Gender, retry: Int): String {
 
@@ -90,7 +141,7 @@ object NINUtil {
     }
 
     private fun valid(nin: String) = NorwegianNinValidator.validateNorwegianNin(nin).valid
-    private fun gender(nin: String) = if (Character.getNumericValue(nin[8]) % 2 != 0) Gender.MALE else Gender.FEMALE
+    private fun gender(nin: String) = if (Character.getNumericValue(nin[GENDER_DIGIT]) % 2 != 0) Gender.MALE else Gender.FEMALE
 
     private fun calculateControlDigit(checkDigitSeries: IntArray, digits: IntArray): Int {
         val sumDigits = (0 until checkDigitSeries.size).sumBy { checkDigitSeries[it] * digits[it] }
@@ -104,8 +155,8 @@ object NINUtil {
 
         if(result.valid) {
             val gender = gender(nin)
-            val DOB = dob(nin)
-            return Details(gender, DOB)
+            val dob = dob(nin)
+            return Details(gender, dob)
         }
 
         throw IllegalArgumentException(result.reason)

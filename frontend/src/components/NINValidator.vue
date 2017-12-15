@@ -1,7 +1,6 @@
 <template>
   <div class="NINValidator">
       <h1>{{ msg }}</h1>
-      <router-link to="/health"></router-link>
 
       <el-form :model="nin" ref="nin">
         <el-form-item prop="input"
@@ -29,7 +28,7 @@
 
     <script>
     import axios from 'axios'
-    import 'element-ui/lib/theme-default/index.css'
+    import 'element-ui/lib/theme-chalk/index.css'
     import { Button, Input, InputNumber, Form, FormItem } from 'element-ui'
     import lang from 'element-ui/lib/locale/lang/en'
     import locale from 'element-ui/lib/locale'
@@ -63,7 +62,8 @@
   },
   methods: {
     submitForm (e) {
-      if(e.type=='click' || (e.type=='keypress' && e.key=='Enter')) {
+      this.errorMsg = ''
+      if(e.type==='click' || (e.type==='keypress' && e.key==='Enter')) {
         this.$refs['nin'].validate((valid) => {
           if (valid) {
             this.post()
@@ -83,16 +83,13 @@
         this.dob = response.data.formattedDOB
         this.gender = response.data.gender
       }).catch(error => {
-        console.log(error)
         this.dob = ''
         this.gender = ''
-
-        if(error.response.status==404) {
+        if(error.response.status===404) {
           this.errorMsg = "cannot contact server"
         } else {
           this.errorMsg = error.response.data
         }
-
       })
     }
   }
@@ -126,7 +123,7 @@ div {
 }
 
 div.el-input {
-  width:15%;
+  width:20%;
 }
 
 </style>

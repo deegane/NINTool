@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 @SpringBootTest
 class NorwegianNinValidatorTest {
 
-     var males = listOf("21034814500",
+     private var males = listOf("21034814500",
             "26077938760",
             "29011288160",
             "08092135560",
@@ -48,7 +48,7 @@ class NorwegianNinValidatorTest {
             "28044231346",
             "12046504923")
 
-     var females = listOf(
+     private var females = listOf(
             "01092127040",
             "27123326615",
             "16070870618",
@@ -88,7 +88,7 @@ class NorwegianNinValidatorTest {
             "13100669441"
     )
 
-    val invalidControlDigits = listOf(
+    private val invalidControlDigits = listOf(
             "18099805991",
             "53124717928"
     )

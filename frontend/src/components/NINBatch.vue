@@ -1,9 +1,31 @@
 <template>
-  <div class="NINGenerator">
+  <div class="NINBatch">
     <h1>{{ msg }}</h1>
-    <el-form :model="details" ref="details">
+    <el-form :model="batch" ref="batch">
+
+
+      <el-form-item prop="from" :rules="[{ required: true, message: 'from date required' }] " >
+        <el-date-picker id="from"
+                        v-model="batch.from"
+                        type="date"
+                        placeholder="Select From Date"
+                        format="dd-MM-yyyy">
+        </el-date-picker>
+      </el-form-item>
+
+
+      <el-form-item prop="to" :rules="[{ required: true, message: 'to date required' }] " >
+        <el-date-picker id="to"
+                        v-model="batch.to"
+                        type="date"
+                        placeholder="Select To Date"
+                        format="dd-MM-yyyy">
+        </el-date-picker>
+      </el-form-item>
+
+
       <el-form-item prop="gender" :rules="[{ required: true, message: 'gender required' }]">
-        <el-select v-model="details.gender" placeholder="Select Gender">
+        <el-select v-model="batch.gender" placeholder="Select Gender">
           <el-option
             v-for="item in genders"
             :key="item.value"
@@ -13,17 +35,17 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item prop="dob" :rules="[{ required: true, message: 'dob required' }] " >
-        <el-date-picker id="dob"
-                        v-model="details.dob"
-                        type="date"
-                        placeholder="Select DOB"
-                        format="dd-MM-yyyy">
-        </el-date-picker>
+      <el-form-item prop="numberToGenerate" :rules="[
+                        { required: true, message: 'Number required'},
+                        { pattern: /^[0-9]+$/, message: 'Number required'},
+                        { min: 1, max: 5, message: 'Number outside allowable range'}
+                        ]">
+          <el-input id="numberToGenerate" placeholder="Number to generate" v-model="batch.numberToGenerate" width="10px"/>
       </el-form-item>
 
+
       <el-form-item>
-        <el-button type="primary" @click="submitForm">Generate NIN</el-button>
+        <el-button type="primary" @click="submitForm">Generate File</el-button>
         <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
     </el-form>
@@ -35,6 +57,7 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 import 'element-ui/lib/theme-chalk/index.css'
 import { Button, Select, Input, Option, DatePicker, Form, FormItem } from 'element-ui'
 import lang from 'element-ui/lib/locale/lang/en'
@@ -42,7 +65,7 @@ import locale from 'element-ui/lib/locale'
 locale.use(lang)
 
 export default {
-  name: 'NINGenerator',
+  name: 'NINBatch',
   components: {
     'el-select': Select,
     'el-option': Option,
@@ -54,12 +77,13 @@ export default {
   },
   data () {
     return {
-      msg: 'Generator',
+      msg: 'Batch',
       errorMsg: '',
-      details: {
-        dob: '',
+      batch: {
+        from: '',
+        to: '',
         gender: '',
-        number: ''
+        numberToGenerate: ''
       },
       NIN: '',
       number:'',
@@ -82,7 +106,7 @@ export default {
     submitForm(e) {
       this.errorMsg = ''
       if(e.type==='click' || (e.type==='keypress' && e.key==='Enter')) {
-        this.$refs['details'].validate((valid) => {
+        this.$refs['batch'].validate((valid) => {
           if (valid) {
             this.post()
           }
@@ -92,14 +116,21 @@ export default {
     resetForm() {
       this.NIN = ''
       this.errorMsg = ''
-      this.$refs['details'].resetFields()
+      this.$refs['batch'].resetFields()
     },
     post () {
-      axios.post('/generate', {
-        gender: this.details.gender,
-        dob: this.details.dob
+      axios.post('/batch', {
+        gender: this.batch.gender,
+        from: this.batch.from,
+        to: this.batch.to,
+        numberToGenerate: this.batch.numberToGenerate,
       }).then(response => {
-        this.NIN = response.data
+        let blob = new Blob([response.data], { type:  'application/octet-stream' } )
+        let link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = this.batch.numberToGenerate + "_" + this.batch.gender + "_NINs_from_" + moment(this.batch.from).format('DD-MM-YYYY')
+          + "_to_" + moment(this.batch.to).format('DD-MM-YYYY') +"_"+ ".txt"
+        link.click()
       }).catch(error => {
         this.NIN = ''
         if(error.response.status===404) {
@@ -142,6 +173,7 @@ div {
 div.el-input {
   width:20%;
 }
+
 
 div.el-select {
   width:20%;
