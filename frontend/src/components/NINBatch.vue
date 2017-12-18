@@ -133,7 +133,7 @@ export default {
         link.click()
       }).catch(error => {
         this.NIN = ''
-        if(error.response.status===404) {
+        if(!error.response) {
           this.errorMsg = "cannot contact server"
         } else {
           this.errorMsg = error.response.data

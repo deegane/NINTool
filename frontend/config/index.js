@@ -1,7 +1,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
-var port = process.env.PORT || 8090
+var port = process.env.PORT || 8091
 
 console.log("port" + port);
 

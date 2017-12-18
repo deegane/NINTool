@@ -1,10 +1,12 @@
 package com.nin.validation
 
+import com.nin.model.NationalIdentityNumber
 
-data class NinValidationStep (val predicateName: String, val predicate: (String) -> Boolean, val failReason: String) {
+
+data class NinValidationStep (val predicateName: String, val predicate: (NationalIdentityNumber) -> Boolean, val failReason: String) {
 
     companion object {
-        fun of(predicateName: String, predicate: (String) -> Boolean, failReason: String): NinValidationStep {
+        fun of(predicateName: String, predicate: (NationalIdentityNumber) -> Boolean, failReason: String): NinValidationStep {
             return NinValidationStep(predicateName, predicate, failReason)
         }
     }

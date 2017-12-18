@@ -1,20 +1,14 @@
 package com.nin.validation
 
-import com.nin.util.NINUtil
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit4.SpringRunner
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import com.nin.model.Gender
+import com.nin.model.NationalIdentityNumber
+import com.nin.model.NationalIdentityNumberDTO
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.specs.ShouldSpec
 
-@RunWith(SpringRunner::class)
-@SpringBootTest
-class NorwegianNinValidatorTest {
+class NorwegianNinValidatorTest : ShouldSpec() {
 
-     private var males = listOf("21034814500",
+    private var males = listOf("21034814500",
             "26077938760",
             "29011288160",
             "08092135560",
@@ -48,7 +42,7 @@ class NorwegianNinValidatorTest {
             "28044231346",
             "12046504923")
 
-     private var females = listOf(
+    private var females = listOf(
             "01092127040",
             "27123326615",
             "16070870618",
@@ -93,57 +87,48 @@ class NorwegianNinValidatorTest {
             "53124717928"
     )
 
+    init {
 
-    @Test
-    fun test() {
-        val result = NorwegianNinValidator.validateNorwegianNin("25091772739")
-        print(result)
-        Assert.assertTrue(result.valid)
-    }
-
-    @Test
-    fun males() {
-        males.forEach {
-            assertTrue(NorwegianNinValidator.validateNorwegianNin(it).valid)
-            assertTrue(NINUtil.details(it).gender.isMale)
+        should("generate male nins") {
+            males.forEach {
+                val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber(it, Gender.MALE))
+                result.valid shouldBe true
+                NationalIdentityNumberDTO(it).getGender() shouldBe Gender.MALE
+            }
         }
-    }
 
-    @Test
-    fun females() {
-        females.forEach {
-            assertTrue(NorwegianNinValidator.validateNorwegianNin(it).valid)
-            assertTrue(NINUtil.details(it).gender.isFemale)
+        should("generate female nins") {
+            females.forEach {
+                val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber(it, Gender.FEMALE))
+                result.valid shouldBe true
+                NationalIdentityNumberDTO(it).getGender() shouldBe Gender.FEMALE
+            }
         }
-    }
 
-    @Test
-    fun invalidControlDigits() {
-        invalidControlDigits.forEach {
-            val validationResult = NorwegianNinValidator.validateNorwegianNin(it)
-            assertFalse(validationResult.valid)
-            assertEquals(validationResult.reason, "NIN does not match checksum modulo.")
+        should ("fail checksum check") {
+            invalidControlDigits.forEach {
+                val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber(it))
+                result.valid shouldBe false
+                result.reason shouldBe "NIN does not match checksum modulo."
+            }
         }
-    }
 
-    @Test
-    fun incorrectLength() {
-        val validationResult = NorwegianNinValidator.validateNorwegianNin("12344556")
-        assertFalse(validationResult.valid)
-        assertEquals(validationResult.reason, "NIN has an incorrect length.")
-    }
+        should("fail length check") {
+            val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber("12344556"))
+            result.valid shouldBe false
+            result.reason shouldBe "NIN has an incorrect length."
+        }
 
-    @Test
-    fun regex() {
-        val validationResult = NorwegianNinValidator.validateNorwegianNin("123456789AB")
-        assertFalse(validationResult.valid)
-        assertEquals(validationResult.reason, "NIN does not match needed regex.")
-    }
+        should("fail regex check") {
+            val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber("123456789AB"))
+            result.valid shouldBe false
+            result.reason shouldBe "NIN does not match needed regex."
+        }
 
-    @Test
-    fun birthdayNotInRange() {
-        val validationResult = NorwegianNinValidator.validateNorwegianNin("17029949266")
-        assertFalse(validationResult.valid)
-        assertEquals(validationResult.reason, "NIN does not match checksum modulo.")
+        should("fail birthday range check") {
+            val result = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber("17029949266"))
+            result.valid shouldBe false
+            result.reason shouldBe "NIN does not match checksum modulo."
+        }
     }
 }

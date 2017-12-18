@@ -1,29 +1,35 @@
 package com.nin.controller
 
 import com.nin.model.BatchRequest
-import com.nin.model.Details
+import com.nin.model.GenerateRequest
+import com.nin.model.NationalIdentityNumber
+import com.nin.model.NationalIdentityNumberDTO
 import com.nin.util.NINUtil
 import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.Resource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @CrossOrigin(origins = ["*"]) // left in dev purposes
 class Controller {
 
     @PostMapping("/generate")
-    fun generateFakeNIN(@RequestBody details: Details) = NINUtil.generateFakeNIN(details)
+    fun generateFakeNIN(@Valid @RequestBody generateRequest: GenerateRequest) = NINUtil.generateFakeNIN(generateRequest)
 
     @PostMapping(value = ["/batch"],
                 produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
-    fun generateBatch(@RequestBody batch: BatchRequest) : ResponseEntity<Resource>
-            = ResponseEntity(FileSystemResource(NINUtil.generateBatch(batch)), HttpStatus.OK)
+    fun generateBatch(@Valid @RequestBody batch: BatchRequest) = ResponseEntity(
+            FileSystemResource(NINUtil.generateBatch(batch)),
+            HttpStatus.OK
+    )
 
     @PostMapping("/validate")
-    fun generateFakeNIN(@RequestBody nin: List<String>) = NINUtil.details(nin[0])
+    fun validate(@Valid @RequestBody nin: NationalIdentityNumber): NationalIdentityNumberDTO {
+       return NationalIdentityNumberDTO(nin.nationalIdentityNumber)
+    }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(IllegalArgumentException::class)

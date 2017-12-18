@@ -99,10 +99,10 @@ export default {
         gender: this.details.gender,
         dob: this.details.dob
       }).then(response => {
-        this.NIN = response.data
+        this.NIN = response.data.nationalIdentityNumber
       }).catch(error => {
         this.NIN = ''
-        if(error.response.status===404) {
+        if(!error.response) {
           this.errorMsg = "cannot contact server"
         } else {
           this.errorMsg = error.response.data

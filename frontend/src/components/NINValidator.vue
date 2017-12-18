@@ -78,14 +78,16 @@
       this.$refs['nin'].resetFields()
     },
     post () {
-      axios.post('/validate', [this.nin.input])
+      axios.post('/validate', {
+        nationalIdentityNumber: this.nin.input
+      })
         .then(response => {
-        this.dob = response.data.formattedDOB
+        this.dob = response.data.dob
         this.gender = response.data.gender
       }).catch(error => {
         this.dob = ''
         this.gender = ''
-        if(error.response.status===404) {
+        if(!error.response) {
           this.errorMsg = "cannot contact server"
         } else {
           this.errorMsg = error.response.data

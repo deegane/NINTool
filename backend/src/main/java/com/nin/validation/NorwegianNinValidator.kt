@@ -1,6 +1,7 @@
 package com.nin.validation
 
 
+import com.nin.model.NationalIdentityNumber
 import java.time.LocalDate
 
 object NorwegianNinValidator {
@@ -14,8 +15,10 @@ object NorwegianNinValidator {
     private const val NIN_DOES_NOT_MATCH_FIRST_CHECKSUM_MODULO = "NIN does not match checksum modulo."
     private const val NIN_DOES_NOT_MATCH_SECOND_CHECKSUM_MODULO = "NIN does not match checksum modulo."
     private const val INVALID_BIRTH_DATE_FOR_GIVEN_NIN = "Invalid birth date for given NIN."
+    private const val NIN_GENDER_DIGIT_DOES_NOT_MATCH_ASSIGNED_GENDER = "nin.validation.gender"
 
     private const val LENGTH = 11
+    private const val GENDER_DIGIT = 8
 
     // The two checksum series
     // From https://nn.wikipedia.org/wiki/F%C3%B8dselsnummer
@@ -26,25 +29,32 @@ object NorwegianNinValidator {
     //for digit 11, the 2nd check digit
     private val checksumSeries2 = intArrayOf(5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1)
 
-    private val isCorrectLength = { nin: String -> nin.length == LENGTH }
-    private val matchesRegex = { nin: String -> Regex("[0-9]{2}[0,1][0-9][0-9]{2}[0-9]{5}").containsMatchIn(nin) }
-    private val matchesChecksum1 = { nin: String -> matchesChecksum(nin, checksumSeries1) }
-    private val matchesChecksum2 = { nin: String -> matchesChecksum(nin, checksumSeries2) }
-    private val isValidBirthDate = { nin: String -> validBirthDate(nin, "") }
+    private val isCorrectLength = { nin: NationalIdentityNumber -> nin.nationalIdentityNumber.length == LENGTH }
+    private val matchesRegex = { nin: NationalIdentityNumber -> Regex("[0-9]{2}[0,1][0-9][0-9]{2}[0-9]{5}").containsMatchIn(nin.nationalIdentityNumber) }
+    private val matchesChecksum1 = { nin: NationalIdentityNumber -> matchesChecksum(nin.nationalIdentityNumber, checksumSeries1) }
+    private val matchesChecksum2 = { nin: NationalIdentityNumber -> matchesChecksum(nin.nationalIdentityNumber, checksumSeries2) }
+    private val isValidBirthDate = { nin: NationalIdentityNumber -> validBirthDate(nin.nationalIdentityNumber, "") }
 
-    fun validateNorwegianNin(nin: String): NinValidationResult {
+    private val isValidGenderNin = { nin: NationalIdentityNumber ->
+        val isMaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].toInt() % 2 != 0
+        val isFemaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].toInt() % 2 == 0
+        nin.gender.isUnknown || (nin.gender.isMale && isMaleDigit) || (nin.gender.isFemale || isFemaleDigit)
+    }
+
+    fun validateNorwegianNin(nationalIdentityNumber: NationalIdentityNumber): NinValidationResult {
 
         val rules = listOf(
                 NinValidationStep.of("isCorrectLength", isCorrectLength, NIN_HAS_AN_INCORRECT_LENGTH),
                 NinValidationStep.of("matchesRegex", matchesRegex, NIN_DOES_NOT_MATCH_NEEDED_REGEX),
                 NinValidationStep.of("matchesChecksum1", matchesChecksum1, NIN_DOES_NOT_MATCH_FIRST_CHECKSUM_MODULO),
                 NinValidationStep.of("matchesChecksum2", matchesChecksum2, NIN_DOES_NOT_MATCH_SECOND_CHECKSUM_MODULO),
+                NinValidationStep.of("isValidGenderNin", isValidGenderNin, NIN_GENDER_DIGIT_DOES_NOT_MATCH_ASSIGNED_GENDER),
                 NinValidationStep.of("isValidBirthDate", isValidBirthDate, INVALID_BIRTH_DATE_FOR_GIVEN_NIN)
         )
 
         for (rule in rules) {
             try {
-                val isValid = rule.predicate(nin)
+                val isValid = rule.predicate(nationalIdentityNumber)
 
                 if (!isValid) {
                     print("Validation failure: $rule.predicateName")
@@ -56,6 +66,7 @@ object NorwegianNinValidator {
             }
 
         }
+
         return NinValidationResult.success()
     }
 
