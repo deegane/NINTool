@@ -2,7 +2,7 @@
   <div class="NINValidator">
       <h1>{{ msg }}</h1>
 
-      <el-form :model="nin" ref="nin">
+      <el-form :model="nin" ref="ninForm">
         <el-form-item prop="input"
                       :rules="[
                         { required: true, message: 'NIN required'},
@@ -10,11 +10,11 @@
                         { min: 11, max: 11, message: 'NIN should be 11 digits'}
                         ]">
 
-          <el-input placeholder="Enter NIN" v-model="nin.input" width="20px"></el-input>
+          <el-input placeholder="Enter NIN" v-model="nin.input"></el-input>
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @key.enter="submitForm" @click="submitForm">Validate</el-button>
+        <el-form-item class="button-row">
+          <el-button type="primary" @click="submitForm">Validate</el-button>
           <el-button @click="resetForm">Reset</el-button>
         </el-form-item>
       </el-form>
@@ -26,45 +26,33 @@
     </div>
 </template>
 
-    <script>
-    import axios from 'axios'
-    import 'element-ui/lib/theme-chalk/index.css'
-    import { Button, Input, InputNumber, Form, FormItem } from 'element-ui'
-    import lang from 'element-ui/lib/locale/lang/en'
-    import locale from 'element-ui/lib/locale'
-    locale.use(lang)
+<script>
+import axios from 'axios'
 
-    export default {
-      name: 'Validator',
-      components: {
-        'el-button': Button,
-        'el-input': Input,
-        'el-form': Form,
-        'el-form-item': FormItem,
-        'el-input-number': InputNumber
+export default {
+  name: 'NINValidator',
+  data () {
+    return {
+      msg: 'Validator',
+      errorMsg: '',
+      nin: {
+        input: ''
       },
-      data () {
-        return {
-          msg: 'Validator',
-          errorMsg: '',
-          nin: {
-            input: ''
-          },
-          dob: '',
-          gender: ''
+      dob: '',
+      gender: ''
     }
   },
-  mounted: function () {
+  mounted() {
     document.addEventListener('keypress', this.submitForm, false)
   },
-  beforeDestroy: function () {
+  beforeUnmount() {
     document.removeEventListener('keypress', this.submitForm, false)
   },
   methods: {
     submitForm (e) {
       this.errorMsg = ''
       if(e.type==='click' || (e.type==='keypress' && e.key==='Enter')) {
-        this.$refs['nin'].validate((valid) => {
+        this.$refs.ninForm.validate((valid) => {
           if (valid) {
             this.post()
           }
@@ -75,7 +63,7 @@
       this.dob = ''
       this.gender = ''
       this.errorMsg = ''
-      this.$refs['nin'].resetFields()
+      this.$refs.ninForm.resetFields()
     },
     post () {
       axios.post('/validate', {
@@ -120,18 +108,10 @@ a {
   color: #42b983;
 }
 
-div {
-  padding-bottom: 0px;
+.NINValidator {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-div.el-input {
-  width:20%;
-}
-
-</style>
-
-<style>
-  div.el-form-item__error {
-    position:static;
-  }
 </style>

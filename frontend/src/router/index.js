@@ -1,31 +1,33 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import NINGenerator from '../components/NINGenerator'
-import NINValidator from '../components/NINValidator'
-import NINBatch from '../components/NINBatch'
+import { createRouter, createWebHistory } from 'vue-router'
+import NINGenerator from '../components/NINGenerator.vue'
+import NINValidator from '../components/NINValidator.vue'
+import NINBatch from '../components/NINBatch.vue'
 
-Vue.use(Router)
+const routes = [
+  {
+    path: '/',
+    redirect: '/nin/generator'
+  },
+  {
+    path: '/nin/generator',
+    name: 'NINGenerator',
+    component: NINGenerator
+  },
+  {
+    path: '/nin/validator',
+    name: 'NINValidator',
+    component: NINValidator
+  },
+  {
+    path: '/nin/batch',
+    name: 'NINBatch',
+    component: NINBatch
+  }
+]
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      redirect: '/nin/generator'
-    },
-    {
-      path: '/nin/generator',
-      name: 'NINGenerator',
-      component: NINGenerator
-    },
-    {
-      path: '/nin/validator',
-      name: 'NINValidator',
-      component: NINValidator
-    },
-    {
-      path: '/nin/batch',
-      name: 'NINBatch',
-      component: NINBatch
-    }
-  ]
+const router = createRouter({
+  history: createWebHistory(),
+  routes
 })
+
+export default router

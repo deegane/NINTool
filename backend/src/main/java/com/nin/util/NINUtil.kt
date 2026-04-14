@@ -141,7 +141,7 @@ object NINUtil {
     private fun valid(nin: String, gender: Gender) = NorwegianNinValidator.validateNorwegianNin(NationalIdentityNumber(nin, gender)).valid
 
     private fun calculateControlDigit(checkDigitSeries: IntArray, digits: IntArray): Int {
-        val sumDigits = (0 until checkDigitSeries.size).sumBy { checkDigitSeries[it] * digits[it] }
+        val sumDigits = (0 until checkDigitSeries.size).sumOf { checkDigitSeries[it] * digits[it] }
         val control = 11 - sumDigits % 11
         return if (control == 11) 0 else control
     }
