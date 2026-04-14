@@ -14,7 +14,7 @@ java -jar backend/target/NINTool-0.0.5-SNAPSHOT.jar --server.port=9090
 
 OR
 
-mvn --projects backend spring-boot:run
+mvn spring-boot:run -pl backend
 
 Development:
 
