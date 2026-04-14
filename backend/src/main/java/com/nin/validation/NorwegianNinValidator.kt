@@ -36,8 +36,8 @@ object NorwegianNinValidator {
     private val isValidBirthDate = { nin: NationalIdentityNumber -> validBirthDate(nin.nationalIdentityNumber, "") }
 
     private val isValidGenderNin = { nin: NationalIdentityNumber ->
-        val isMaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].toInt() % 2 != 0
-        val isFemaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].toInt() % 2 == 0
+        val isMaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].code % 2 != 0
+        val isFemaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].code % 2 == 0
         nin.gender.isUnknown || (nin.gender.isMale && isMaleDigit) || (nin.gender.isFemale || isFemaleDigit)
     }
 
@@ -70,7 +70,7 @@ object NorwegianNinValidator {
         return NinValidationResult.success()
     }
 
-    private fun matchesChecksum(nin: String, checksum: IntArray) = (0 until checksum.size).sumBy { checksum[it] * ninAsInts(nin)[it] } % 11 == 0
+    private fun matchesChecksum(nin: String, checksum: IntArray) = (0 until checksum.size).sumOf { checksum[it] * ninAsInts(nin)[it] } % 11 == 0
 
     private fun ninAsInts(nin: String): IntArray {
         val ninInt = IntArray(LENGTH)

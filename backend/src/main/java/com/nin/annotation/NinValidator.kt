@@ -2,8 +2,8 @@ package com.nin.annotation
 
 import com.nin.model.NationalIdentityNumber
 import com.nin.validation.NorwegianNinValidator
-import javax.validation.ConstraintValidator
-import javax.validation.ConstraintValidatorContext
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.ConstraintValidatorContext
 
 class NinValidator : ConstraintValidator<NinValid, NationalIdentityNumber> {
     override fun isValid(nin: NationalIdentityNumber, context: ConstraintValidatorContext): Boolean {

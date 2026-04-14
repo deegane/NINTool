@@ -3,8 +3,8 @@ package com.nin.validation
 import com.nin.model.Gender
 import com.nin.model.NationalIdentityNumber
 import com.nin.model.NationalIdentityNumberDTO
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.specs.ShouldSpec
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 
 class NorwegianNinValidatorTest : ShouldSpec() {
 

@@ -1,7 +1,7 @@
 <template>
   <div class="NINGenerator">
     <h1>{{ msg }}</h1>
-    <el-form :model="details" ref="details">
+    <el-form :model="details" ref="detailsForm">
       <el-form-item prop="gender" :rules="[{ required: true, message: 'gender required' }]">
         <el-select v-model="details.gender" placeholder="Select Gender">
           <el-option
@@ -18,11 +18,11 @@
                         v-model="details.dob"
                         type="date"
                         placeholder="Select DOB"
-                        format="dd-MM-yyyy">
+                        format="DD-MM-YYYY">
         </el-date-picker>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item class="button-row">
         <el-button type="primary" @click="submitForm">Generate NIN</el-button>
         <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
@@ -35,23 +35,9 @@
 
 <script>
 import axios from 'axios'
-import 'element-ui/lib/theme-chalk/index.css'
-import { Button, Select, Input, Option, DatePicker, Form, FormItem } from 'element-ui'
-import lang from 'element-ui/lib/locale/lang/en'
-import locale from 'element-ui/lib/locale'
-locale.use(lang)
 
 export default {
   name: 'NINGenerator',
-  components: {
-    'el-select': Select,
-    'el-option': Option,
-    'el-date-picker': DatePicker,
-    'el-button': Button,
-    'el-input': Input,
-    'el-form': Form,
-    'el-form-item': FormItem
-  },
   data () {
     return {
       msg: 'Generator',
@@ -72,17 +58,17 @@ export default {
       }]
     }
   },
-  mounted: function () {
+  mounted() {
     document.addEventListener('keypress', this.submitForm, false)
   },
-  beforeDestroy: function () {
+  beforeUnmount() {
     document.removeEventListener('keypress', this.submitForm, false)
   },
   methods: {
     submitForm(e) {
       this.errorMsg = ''
       if(e.type==='click' || (e.type==='keypress' && e.key==='Enter')) {
-        this.$refs['details'].validate((valid) => {
+        this.$refs.detailsForm.validate((valid) => {
           if (valid) {
             this.post()
           }
@@ -92,7 +78,7 @@ export default {
     resetForm() {
       this.NIN = ''
       this.errorMsg = ''
-      this.$refs['details'].resetFields()
+      this.$refs.detailsForm.resetFields()
     },
     post () {
       axios.post('/generate', {
@@ -135,22 +121,11 @@ a {
   color: #42b983;
 }
 
-div {
-  padding-bottom: 0px;
+.NINGenerator {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-div.el-input {
-  width:20%;
-}
 
-div.el-select {
-  width:20%;
-}
-
-</style>
-
-<style>
-  div.el-form-item__error {
-    position:static;
-  }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="NINBatch">
     <h1>{{ msg }}</h1>
-    <el-form :model="batch" ref="batch">
+    <el-form :model="batch" ref="batchForm">
 
 
       <el-form-item prop="from" :rules="[{ required: true, message: 'from date required' }] " >
@@ -9,7 +9,7 @@
                         v-model="batch.from"
                         type="date"
                         placeholder="Select From Date"
-                        format="dd-MM-yyyy">
+                        format="DD-MM-YYYY">
         </el-date-picker>
       </el-form-item>
 
@@ -19,7 +19,7 @@
                         v-model="batch.to"
                         type="date"
                         placeholder="Select To Date"
-                        format="dd-MM-yyyy">
+                        format="DD-MM-YYYY">
         </el-date-picker>
       </el-form-item>
 
@@ -40,11 +40,11 @@
                         { pattern: /^[0-9]+$/, message: 'Number required'},
                         { min: 1, max: 5, message: 'Number outside allowable range'}
                         ]">
-          <el-input id="numberToGenerate" placeholder="Number to generate" v-model="batch.numberToGenerate" width="10px"/>
+          <el-input id="numberToGenerate" placeholder="Number to generate" v-model="batch.numberToGenerate"/>
       </el-form-item>
 
 
-      <el-form-item>
+      <el-form-item class="button-row">
         <el-button type="primary" @click="submitForm">Generate File</el-button>
         <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
@@ -57,24 +57,10 @@
 
 <script>
 import axios from 'axios'
-import moment from 'moment'
-import 'element-ui/lib/theme-chalk/index.css'
-import { Button, Select, Input, Option, DatePicker, Form, FormItem } from 'element-ui'
-import lang from 'element-ui/lib/locale/lang/en'
-import locale from 'element-ui/lib/locale'
-locale.use(lang)
+import dayjs from 'dayjs'
 
 export default {
   name: 'NINBatch',
-  components: {
-    'el-select': Select,
-    'el-option': Option,
-    'el-date-picker': DatePicker,
-    'el-button': Button,
-    'el-input': Input,
-    'el-form': Form,
-    'el-form-item': FormItem
-  },
   data () {
     return {
       msg: 'Batch',
@@ -96,17 +82,17 @@ export default {
       }]
     }
   },
-  mounted: function () {
+  mounted() {
     document.addEventListener('keypress', this.submitForm, false)
   },
-  beforeDestroy: function () {
+  beforeUnmount() {
     document.removeEventListener('keypress', this.submitForm, false)
   },
   methods: {
     submitForm(e) {
       this.errorMsg = ''
       if(e.type==='click' || (e.type==='keypress' && e.key==='Enter')) {
-        this.$refs['batch'].validate((valid) => {
+        this.$refs.batchForm.validate((valid) => {
           if (valid) {
             this.post()
           }
@@ -116,7 +102,7 @@ export default {
     resetForm() {
       this.NIN = ''
       this.errorMsg = ''
-      this.$refs['batch'].resetFields()
+      this.$refs.batchForm.resetFields()
     },
     post () {
       axios.post('/batch', {
@@ -128,8 +114,8 @@ export default {
         let blob = new Blob([response.data], { type:  'application/octet-stream' } )
         let link = document.createElement('a')
         link.href = window.URL.createObjectURL(blob)
-        link.download = this.batch.numberToGenerate + "_" + this.batch.gender + "_NINs_from_" + moment(this.batch.from).format('DD-MM-YYYY')
-          + "_to_" + moment(this.batch.to).format('DD-MM-YYYY') +"_"+ ".txt"
+        link.download = this.batch.numberToGenerate + "_" + this.batch.gender + "_NINs_from_" + dayjs(this.batch.from).format('DD-MM-YYYY')
+          + "_to_" + dayjs(this.batch.to).format('DD-MM-YYYY') +"_"+ ".txt"
         link.click()
       }).catch(error => {
         this.NIN = ''
@@ -166,23 +152,11 @@ a {
   color: #42b983;
 }
 
-div {
-  padding-bottom: 0px;
+.NINBatch {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-div.el-input {
-  width:20%;
-}
 
-
-div.el-select {
-  width:20%;
-}
-
-</style>
-
-<style>
-  div.el-form-item__error {
-    position:static;
-  }
 </style>
