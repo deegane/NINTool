@@ -23,7 +23,7 @@
       </el-form-item>
 
       <el-form-item class="button-row">
-        <el-button type="primary" @click="submitForm">Generate NIN</el-button>
+        <el-button type="primary" @click="submitForm" :loading="isLoading">Generate NIN</el-button>
         <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
     </el-form>
@@ -42,13 +42,12 @@ export default {
     return {
       msg: 'Generator',
       errorMsg: '',
+      isLoading: false,
       details: {
         dob: '',
-        gender: '',
-        number: ''
+        gender: ''
       },
       NIN: '',
-      number:'',
       genders: [{
         value: 'MALE',
         label: 'Male'
@@ -81,6 +80,7 @@ export default {
       this.$refs.detailsForm.resetFields()
     },
     post () {
+      this.isLoading = true
       axios.post('/generate', {
         gender: this.details.gender,
         dob: this.details.dob
@@ -93,6 +93,8 @@ export default {
         } else {
           this.errorMsg = error.response.data
         }
+      }).finally(() => {
+        this.isLoading = false
       })
     }
   }

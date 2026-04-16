@@ -2,9 +2,12 @@ package com.nin.validation
 
 
 import com.nin.model.NationalIdentityNumber
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
 object NorwegianNinValidator {
+
+    private val logger = LoggerFactory.getLogger(NorwegianNinValidator::class.java)
 
     private const val FH_NUMBER = "FHNumber"
     private const val D_NUMBER = "DNumber"
@@ -38,7 +41,7 @@ object NorwegianNinValidator {
     private val isValidGenderNin = { nin: NationalIdentityNumber ->
         val isMaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].code % 2 != 0
         val isFemaleDigit = nin.nationalIdentityNumber[GENDER_DIGIT].code % 2 == 0
-        nin.gender.isUnknown || (nin.gender.isMale && isMaleDigit) || (nin.gender.isFemale || isFemaleDigit)
+        nin.gender.isUnknown || (nin.gender.isMale && isMaleDigit) || (nin.gender.isFemale && isFemaleDigit)
     }
 
     fun validateNorwegianNin(nationalIdentityNumber: NationalIdentityNumber): NinValidationResult {
@@ -57,11 +60,11 @@ object NorwegianNinValidator {
                 val isValid = rule.predicate(nationalIdentityNumber)
 
                 if (!isValid) {
-                    print("Validation failure: $rule.predicateName")
+                    logger.debug("Validation failure: ${rule.predicateName}")
                     return NinValidationResult.fail(rule.predicateName, rule.failReason)
                 }
             } catch (e: Exception) {
-                print("Failed to validate NIN: $rule.predicateName -> Exception: $e.message")
+                logger.debug("Failed to validate NIN: ${rule.predicateName} -> Exception: ${e.message}")
                 return NinValidationResult.fail(rule.predicateName, e.message ?: "unknown")
             }
 
@@ -90,13 +93,13 @@ object NorwegianNinValidator {
         // Let's convert them to real dates/months
         if (day > 40) {
             if (ninType.isNotBlank() && ninType != D_NUMBER) {
-                print("NIN Validation failed due to incorrect NIN type. NIN: $nin")
+                logger.debug("NIN Validation failed due to incorrect NIN type. NIN: {}", nin)
                 return false
             }
             day -= 40
         } else if (month > 40) {
             if (ninType.isNotBlank() && ninType != H_NUMBER) {
-                print("NIN Validation failed due to incorrect NIN type. NIN: $nin")
+                logger.debug("NIN Validation failed due to incorrect NIN type. NIN: {}", nin)
                 return false
             }
             month -= 40
@@ -104,7 +107,7 @@ object NorwegianNinValidator {
         // FH numbers start with 8/9 and can't be used to parse years/dates out of them --> always true
         if (nin.substring(0, 1).toInt() > 7) {
             if (!ninType.isNotBlank() && nin == FH_NUMBER) {
-                print("NIN Validation failed due to incorrect NIN type. NIN: $nin")
+                logger.debug("NIN Validation failed due to incorrect NIN type. NIN: {}", nin)
                 return false
             }
             return true
@@ -116,13 +119,13 @@ object NorwegianNinValidator {
         val fullYear = findYearWithCentury(personalDigits, year)
 
         if(fullYear == 0) {
-            print("NIN Validation failed due to incorrect year. NIN: {} $nin")
+            logger.debug("NIN Validation failed due to incorrect year. NIN: {}", nin)
             return false
         }
 
         val isValid = !invalidDateOfBirth(day, month, fullYear)
         if (!isValid) {
-            print("NIN Validation failed due to invalid date of birth. NIN: {} $nin")
+            logger.debug("NIN Validation failed due to invalid date of birth. NIN: {}", nin)
         }
         return isValid
     }

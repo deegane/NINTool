@@ -13,14 +13,8 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router'
-
 export default {
   name: 'App',
-  setup() {
-    const router = useRouter()
-    return { router }
-  },
   data() {
     return {
       activeIndex: '1',
@@ -29,11 +23,11 @@ export default {
   methods: {
     handleSelect(key) {
       if (key === '1') {
-        this.router.push('/nin/generator')
+        this.$router.push('/nin/generator')
       } else if (key === '2') {
-        this.router.push('/nin/batch')
+        this.$router.push('/nin/batch')
       } else {
-        this.router.push('/nin/validator')
+        this.$router.push('/nin/validator')
       }
     }
   }
