@@ -22,6 +22,10 @@ const routes = [
     path: '/nin/batch',
     name: 'NINBatch',
     component: NINBatch
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/nin/generator'
   }
 ]
 

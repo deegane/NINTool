@@ -58,7 +58,7 @@ object NINUtil {
         val toDate = batch.to.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 
         if(fromDate.isAfter(toDate)) {
-            throw IllegalArgumentException("From date must be after To date")
+            throw IllegalArgumentException("From date must be before To date")
         }
 
         val days = ChronoUnit.DAYS.between(fromDate, toDate)

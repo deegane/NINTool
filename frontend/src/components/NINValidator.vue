@@ -14,7 +14,7 @@
         </el-form-item>
 
         <el-form-item class="button-row">
-          <el-button type="primary" @click="submitForm">Validate</el-button>
+          <el-button type="primary" @click="submitForm" :loading="isLoading">Validate</el-button>
           <el-button @click="resetForm">Reset</el-button>
         </el-form-item>
       </el-form>
@@ -35,6 +35,7 @@ export default {
     return {
       msg: 'Validator',
       errorMsg: '',
+      isLoading: false,
       nin: {
         input: ''
       },
@@ -66,6 +67,7 @@ export default {
       this.$refs.ninForm.resetFields()
     },
     post () {
+      this.isLoading = true
       axios.post('/validate', {
         nationalIdentityNumber: this.nin.input
       })
@@ -80,6 +82,8 @@ export default {
         } else {
           this.errorMsg = error.response.data
         }
+      }).finally(() => {
+        this.isLoading = false
       })
     }
   }

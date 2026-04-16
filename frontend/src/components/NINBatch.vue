@@ -37,15 +37,14 @@
 
       <el-form-item prop="numberToGenerate" :rules="[
                         { required: true, message: 'Number required'},
-                        { pattern: /^[0-9]+$/, message: 'Number required'},
-                        { min: 1, max: 5, message: 'Number outside allowable range'}
+                        { pattern: /^[1-5]$/, message: 'Enter a number between 1 and 5'}
                         ]">
           <el-input id="numberToGenerate" placeholder="Number to generate" v-model="batch.numberToGenerate"/>
       </el-form-item>
 
 
       <el-form-item class="button-row">
-        <el-button type="primary" @click="submitForm">Generate File</el-button>
+        <el-button type="primary" @click="submitForm" :loading="isLoading">Generate File</el-button>
         <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
     </el-form>
@@ -65,6 +64,7 @@ export default {
     return {
       msg: 'Batch',
       errorMsg: '',
+      isLoading: false,
       batch: {
         from: '',
         to: '',
@@ -72,7 +72,6 @@ export default {
         numberToGenerate: ''
       },
       NIN: '',
-      number:'',
       genders: [{
         value: 'MALE',
         label: 'Male'
@@ -105,6 +104,8 @@ export default {
       this.$refs.batchForm.resetFields()
     },
     post () {
+      this.isLoading = true
+      this.errorMsg = ''
       axios.post('/batch', {
         gender: this.batch.gender,
         from: this.batch.from,
@@ -124,6 +125,8 @@ export default {
         } else {
           this.errorMsg = error.response.data
         }
+      }).finally(() => {
+        this.isLoading = false
       })
     }
   }
